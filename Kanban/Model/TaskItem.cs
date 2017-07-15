@@ -11,6 +11,8 @@ namespace Kanban.Model
     {
         public int Id { get; set; }
 
+        private int _name;
+
         private string _header;
         public string Header
         {

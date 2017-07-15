@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace Kanban.ViewModels
 {
-    public class ShellViewModel : BindableBase//, IDropTarget
+    public class ShellViewModel : BindableBase
     {
         private TaskItemRepository _repository;
 
@@ -18,7 +18,6 @@ namespace Kanban.ViewModels
         {
             _repository = repository;
             LoadTaskItems();
-            //PropertyChanged += ShellViewModel_PropertyChanged;
             Backlog.CollectionChanged += CollectionChanged;
             Ready.CollectionChanged += CollectionChanged;
             Doing.CollectionChanged += CollectionChanged;
@@ -29,27 +28,15 @@ namespace Kanban.ViewModels
         {
             if (e.Action==NotifyCollectionChangedAction.Add)
             {
-                //var col = (ObservableCollection<TaskItem>)sender;
-                //var name = nameof(sender);
                 Backlog.ToList().ForEach(t => t.Status = Status.Backlog);
                 Ready.ToList().ForEach(t => t.Status = Status.Ready);
                 Doing.ToList().ForEach(t => t.Status = Status.Doing);
                 Done.ToList().ForEach(t => t.Status = Status.Done);
-                //col.ToList
             }
         }
 
-        //private void ShellViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        //{
-        //    if (e.PropertyName == "SelectedItem")
-        //    {
-        //        Save();
-        //    }
-        //}
-
         private void LoadTaskItems()
         {
-            var b = _repository.GetByStatus(Status.Backlog);
             Backlog.AddRange(_repository.GetByStatus(Status.Backlog).OrderByDescending(t=>t.Created));
             Ready.AddRange(_repository.GetByStatus(Status.Ready).OrderByDescending(t => t.Created));
             Doing.AddRange(_repository.GetByStatus(Status.Doing).OrderByDescending(t => t.Created));
@@ -79,7 +66,12 @@ namespace Kanban.ViewModels
         public TaskItem SelectedItem
         {
             get { return _selectedItem; }
-            set { SetProperty(ref _selectedItem, value); }
+            set
+            {
+                if(_selectedItem!=null) _selectedItem.IsSelected = false;
+                SetProperty(ref _selectedItem, value);
+                if(_selectedItem!=null) _selectedItem.IsSelected = true;
+            }
         }
         public DelegateCommand AddCommand =>new DelegateCommand(Add);
 
@@ -118,12 +110,18 @@ namespace Kanban.ViewModels
             _repository.Delete(item);
         }
 
-        public DelegateCommand SaveCommand => new DelegateCommand(Save);
+        public DelegateCommand SaveCommand => new DelegateCommand(Save).ObservesCanExecute(()=>HasChanges);
 
-        public bool HasChanges { get; internal set; }
+        private bool _hasChanges;
+        public bool HasChanges
+        {
+            get { return _hasChanges; }
+            set { SetProperty(ref _hasChanges, value); }
+        }
 
         private void Save()
         {
+            AllTasks.ToList().ForEach(t => t.IsSelected = false);
             _repository.SaveAll(AllTasks);
 
             Backlog.Clear();
@@ -135,14 +133,5 @@ namespace Kanban.ViewModels
             HasChanges = false;
         }
 
-        //public void DragOver(IDropInfo dropInfo)
-        //{
-        //    dropInfo.Effects = System.Windows.DragDropEffects.Move;
-        //}
-
-        //public void Drop(IDropInfo dropInfo)
-        //{
-        //    var a=dropInfo.Data;
-        //}
     }
 }

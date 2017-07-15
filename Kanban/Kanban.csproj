@@ -220,6 +220,10 @@
     <Compile Include="Migrations\20170710203518_First.designer.cs">
       <DependentUpon>20170710203518_First.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20170712013649_Second.cs" />
+    <Compile Include="Migrations\20170712013649_Second.designer.cs">
+      <DependentUpon>20170712013649_Second.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\KanbanDbContextModelSnapshot.cs" />
     <Compile Include="Model\KanbanDbContext.cs" />
     <Compile Include="Model\Status.cs" />

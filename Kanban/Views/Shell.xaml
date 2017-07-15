@@ -35,8 +35,8 @@
             <Setter Property="ContentTemplate" >
                 <Setter.Value>
                     <DataTemplate>
-                        <DockPanel Margin="5,5,5,0" Height="100">
-                            <DockPanel DockPanel.Dock="Top" LastChildFill="False" Background="{StaticResource AccentColorBrush}">
+                        <DockPanel Name="TaskPanel" Margin="5,5,5,0" MinHeight="100">
+                            <DockPanel DockPanel.Dock="Top" LastChildFill="False" >
                                 <TextBox DockPanel.Dock="Left" 
                                    FontSize="12" 
                                    FontWeight="Bold"
@@ -51,9 +51,37 @@
                             <TextBox Text="{Binding Content, UpdateSourceTrigger=PropertyChanged}" 
                                      TextWrapping="Wrap"
                                      AcceptsReturn="True"
-                                     AcceptsTab="True"
-                                     SpellCheck.IsEnabled="True"></TextBox>
+                                     AcceptsTab="False"
+                                     SpellCheck.IsEnabled="False"></TextBox>
+                            <DockPanel.Style>
+                                <Style>
+                                    <Setter Property="FrameworkElement.Height" Value="100"/>
+                                    <Setter Property="DockPanel.Background" Value="{StaticResource AccentColorBrush2}"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                            <Setter Property="DockPanel.Height" Value="Auto"/>
+                                            <Setter Property="DockPanel.Background" Value="#FFA266A2"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DockPanel.Style>
                         </DockPanel>
+                        <!--<DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding IsSelected}" Value="False">
+                                <DataTrigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation 
+                                                            Storyboard.TargetName="TaskPanel"
+                                                            Storyboard.TargetProperty="(FrameworkElement.Height)"
+                                                            Duration="0:0:1" 
+                                                            To="100" 
+                                                            AutoReverse="True"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </DataTrigger.EnterActions>
+                            </DataTrigger>
+                        </DataTemplate.Triggers>-->
                     </DataTemplate>
                 </Setter.Value>
             </Setter>
