@@ -28,6 +28,7 @@
             <Setter Property="Padding" Value="0"/>
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+            <Setter Property="ScrollViewer.PanningMode" Value="None"/>
             <Setter Property="SelectedItem" Value="{Binding SelectedItem, Mode=OneWayToSource}"/>
         </Style>
         <Style TargetType="ListBoxItem">
@@ -42,13 +43,13 @@
                                    FontWeight="Bold"
                                    Background="Transparent"
                                    BorderThickness="0"
-                                   Text="{Binding Header, UpdateSourceTrigger=PropertyChanged}"/>
+                                   Text="{Binding Header, UpdateSourceTrigger=LostFocus}"/>
                                 <Label DockPanel.Dock="Right"
                                        FontSize="12" 
                                        FontWeight="Bold"
                                        Content="{Binding Created, StringFormat=d}"/>
                             </DockPanel>
-                            <TextBox Text="{Binding Content, UpdateSourceTrigger=PropertyChanged}" 
+                            <TextBox Text="{Binding Content, UpdateSourceTrigger=LostFocus}" 
                                      TextWrapping="Wrap"
                                      AcceptsReturn="True"
                                      AcceptsTab="False"

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
 
 namespace Kanban.ViewModels
@@ -18,43 +19,54 @@ namespace Kanban.ViewModels
         {
             _repository = repository;
             LoadTaskItems();
+
             Backlog.CollectionChanged += CollectionChanged;
             Ready.CollectionChanged += CollectionChanged;
             Doing.CollectionChanged += CollectionChanged;
             Done.CollectionChanged += CollectionChanged;
+
+            var watcher = new FileSystemWatcher();
+            watcher.Path = Environment.CurrentDirectory;
+            watcher.NotifyFilter = NotifyFilters.LastWrite;
+            watcher.Filter = "*Kanban.db";
+            watcher.Changed += Watcher_Changed;
+            watcher.EnableRaisingEvents = true;
+        }
+
+        private void Watcher_Changed(object sender, FileSystemEventArgs e)
+        {
+            if (_collectionChanging == true) return;
+            Refresh();
         }
 
         private void CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
+            _collectionChanging = true;
             if (e.Action==NotifyCollectionChangedAction.Add)
             {
+                
                 Backlog.ToList().ForEach(t => t.Status = Status.Backlog);
                 Ready.ToList().ForEach(t => t.Status = Status.Ready);
                 Doing.ToList().ForEach(t => t.Status = Status.Doing);
                 Done.ToList().ForEach(t => t.Status = Status.Done);
             }
+            _collectionChanging = false;
         }
 
-        private void LoadTaskItems()
-        {
-            Backlog.AddRange(_repository.GetByStatus(Status.Backlog).OrderByDescending(t=>t.Created));
-            Ready.AddRange(_repository.GetByStatus(Status.Ready).OrderByDescending(t => t.Created));
-            Doing.AddRange(_repository.GetByStatus(Status.Doing).OrderByDescending(t => t.Created));
-            Done.AddRange(_repository.GetByStatus(Status.Done).OrderByDescending(t => t.Created));
-
-            foreach (var item in AllTasks)
-            {
-                item.PropertyChanged += Item_PropertyChanged;
-            }
-        }
+        
 
         private void Item_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName != "Id")
+            //if (_collectionChanging == true) return;
+
+            if (e.PropertyName != "IsSelected")
             {
                 HasChanges = true;
+                _repository.Save(sender as TaskItem);
             }
         }
+
+        
 
         public ObservableCollection<TaskItem> Backlog { get; set; } = new ObservableCollection<TaskItem>();
         public ObservableCollection<TaskItem> Ready { get; set; } = new ObservableCollection<TaskItem>();
@@ -113,6 +125,8 @@ namespace Kanban.ViewModels
         public DelegateCommand SaveCommand => new DelegateCommand(Save).ObservesCanExecute(()=>HasChanges);
 
         private bool _hasChanges;
+        private bool _collectionChanging;
+
         public bool HasChanges
         {
             get { return _hasChanges; }
@@ -121,17 +135,42 @@ namespace Kanban.ViewModels
 
         private void Save()
         {
-            AllTasks.ToList().ForEach(t => t.IsSelected = false);
             _repository.SaveAll(AllTasks);
+
+            //LoadTaskItems();
+            HasChanges = false;
+        }
+
+        private void LoadTaskItems()
+        {
+            Backlog.AddRange(_repository.GetByStatus(Status.Backlog));//.OrderByDescending(t=>t.Created));
+            Ready.AddRange(_repository.GetByStatus(Status.Ready));//.OrderByDescending(t => t.Created));
+            Doing.AddRange(_repository.GetByStatus(Status.Doing));//.OrderByDescending(t => t.Created));
+            Done.AddRange(_repository.GetByStatus(Status.Done));//.OrderByDescending(t => t.Created));
+
+            foreach (var item in AllTasks)
+            {
+                item.PropertyChanged += Item_PropertyChanged;
+            }
+        }
+
+        private void ClearCollections()
+        {
+            AllTasks.ToList().ForEach(t => t.PropertyChanged -= Item_PropertyChanged);
 
             Backlog.Clear();
             Ready.Clear();
             Doing.Clear();
             Done.Clear();
-
-            LoadTaskItems();
-            HasChanges = false;
         }
 
+        private void Refresh()
+        {
+            App.Current.Dispatcher.Invoke(() =>//to modify obervable collection on dispatcher thread
+            {
+                ClearCollections();
+                LoadTaskItems();
+            });
+        }
     }
 }

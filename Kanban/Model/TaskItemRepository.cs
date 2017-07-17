@@ -29,23 +29,20 @@ namespace Kanban.Model
         {
             using (var context=new KanbanDbContext())
             {
-                if (context.TaskItems.Any(e => e.Id == item.Id))
-                {
-                    context.TaskItems.Attach(item);
-                    context.Entry(item).State = EntityState.Modified;
-                }
-                else
-                {
-                    context.TaskItems.Add(item);
-                }
+                SaveItem(context, item);
                 context.SaveChanges();
             }
         }
+
         public void SaveAll(IEnumerable<TaskItem> items)
         {
-            foreach (var item in items)
+            using (var context = new KanbanDbContext())
             {
-                Save(item);
+                foreach (var item in items)
+                {
+                    SaveItem(context, item);
+                }
+                context.SaveChanges();
             }
         }
 
@@ -62,6 +59,19 @@ namespace Kanban.Model
                     context.SaveChanges();
 
                 }
+            }
+        }
+
+        private void SaveItem(KanbanDbContext context,TaskItem item)
+        {
+            if (context.TaskItems.Any(e => e.Id == item.Id))
+            {
+                context.TaskItems.Attach(item);
+                context.Entry(item).State = EntityState.Modified;
+            }
+            else
+            {
+                context.TaskItems.Add(item);
             }
         }
     }
