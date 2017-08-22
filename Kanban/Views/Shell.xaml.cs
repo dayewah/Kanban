@@ -23,7 +23,7 @@ namespace Kanban.Views
                 MessageBoxResult result = MessageBox.Show("Do you want to save changes?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (result == MessageBoxResult.No)
                 {
-                    e.Cancel = true;
+                    return;
                 }
                 else
                 {

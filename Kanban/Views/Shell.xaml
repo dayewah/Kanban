@@ -12,10 +12,10 @@
         <KeyBinding Command="{Binding DeleteCommand}"  Key="Delete"/>
         <KeyBinding Command="{Binding AddCommand}" Modifiers="Ctrl" Key="N"/>
     </Window.InputBindings>
+
     <Window.Resources>
-        
-        <Style TargetType="Button" BasedOn="{StaticResource CircleButton}"/>
-        
+
+
         <Style TargetType="Label">
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="VerticalAlignment" Value="Top"/>
@@ -96,8 +96,37 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
-        
     </Window.Resources>
+
+    <!--Settings-->
+    <Controls:MetroWindow.Flyouts>
+        <Controls:FlyoutsControl>
+            <Controls:Flyout Name="SettingsFlyout" IsOpen="True" Header="Settings" Theme="Dark" Position="Right" Width="600">
+                <StackPanel Margin="20">
+                    <StackPanel>
+                        <Label HorizontalAlignment="Left">Database</Label>
+                        <DockPanel>
+                            <Button DockPanel.Dock="Right" Margin="5,0">Browse</Button>    
+                            <TextBox Controls:TextBoxHelper.Watermark="Database Path"></TextBox>
+                        </DockPanel>
+                        <Line Width="100" HorizontalAlignment="Center" Fill="Red"></Line>
+                    </StackPanel>
+                </StackPanel>
+            </Controls:Flyout>
+        </Controls:FlyoutsControl>
+    </Controls:MetroWindow.Flyouts>
+    <Controls:MetroWindow.RightWindowCommands>
+        <Controls:WindowCommands>
+            <ToggleButton DockPanel.Dock="Bottom" 
+                          Command="{Binding SettingsCommand}" 
+                          IsChecked="{Binding ElementName=SettingsFlyout, Path=IsOpen}"
+                          ToolTip="Settings">
+                <iconPacks:PackIconModern Width="15" Height="15" Kind="Settings" />
+            </ToggleButton>
+        </Controls:WindowCommands>
+    </Controls:MetroWindow.RightWindowCommands>
+
+    <!--Main Views-->
     <DockPanel Background="WhiteSmoke">
         <StatusBar DockPanel.Dock="Bottom" Height="25"/>
         <DockPanel DockPanel.Dock="Left" Width="60" LastChildFill="False" Margin="10,30">
@@ -116,6 +145,9 @@
             <Button DockPanel.Dock="Bottom" Command="{Binding SettingsCommand}" ToolTip="Settings">
                 <iconPacks:PackIconModern Width="15" Height="15" Kind="Settings" />
             </Button>
+            <DockPanel.Resources>
+                <Style TargetType="Button" BasedOn="{StaticResource CircleButton}"/>
+            </DockPanel.Resources>
         </DockPanel>
         <DockPanel DockPanel.Dock="Right" Width="80"/>
         <Grid>
@@ -152,4 +184,5 @@
             </DockPanel>
         </Grid>
     </DockPanel>
+    
 </Controls:MetroWindow>
