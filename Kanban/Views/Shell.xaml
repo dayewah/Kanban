@@ -4,7 +4,8 @@
              xmlns:prism="http://prismlibrary.com/"   
              xmlns:dd="urn:gong-wpf-dragdrop"
              xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
-             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"                       
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"  
+             xmlns:views="clr-namespace:Kanban.Views"
              prism:ViewModelLocator.AutoWireViewModel="True">
     <Window.InputBindings>
         <KeyBinding Command="{Binding SaveCommand}" Modifiers="Ctrl" Key="S"/>
@@ -67,22 +68,6 @@
                                 </Style>
                             </DockPanel.Style>
                         </DockPanel>
-                        <!--<DataTemplate.Triggers>
-                            <DataTrigger Binding="{Binding IsSelected}" Value="False">
-                                <DataTrigger.EnterActions>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation 
-                                                            Storyboard.TargetName="TaskPanel"
-                                                            Storyboard.TargetProperty="(FrameworkElement.Height)"
-                                                            Duration="0:0:1" 
-                                                            To="100" 
-                                                            AutoReverse="True"/>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </DataTrigger.EnterActions>
-                            </DataTrigger>
-                        </DataTemplate.Triggers>-->
                     </DataTemplate>
                 </Setter.Value>
             </Setter>
@@ -101,17 +86,8 @@
     <!--Settings-->
     <Controls:MetroWindow.Flyouts>
         <Controls:FlyoutsControl>
-            <Controls:Flyout Name="SettingsFlyout" IsOpen="True" Header="Settings" Theme="Dark" Position="Right" Width="600">
-                <StackPanel Margin="20">
-                    <StackPanel>
-                        <Label HorizontalAlignment="Left">Database</Label>
-                        <DockPanel>
-                            <Button DockPanel.Dock="Right" Margin="5,0">Browse</Button>    
-                            <TextBox Controls:TextBoxHelper.Watermark="Database Path"></TextBox>
-                        </DockPanel>
-                        <Line Width="100" HorizontalAlignment="Center" Fill="Red"></Line>
-                    </StackPanel>
-                </StackPanel>
+            <Controls:Flyout Name="SettingsFlyout" IsOpen="False" Header="Settings" Theme="Dark" Position="Right" Width="600">
+                <views:Settings/>
             </Controls:Flyout>
         </Controls:FlyoutsControl>
     </Controls:MetroWindow.Flyouts>
